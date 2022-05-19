@@ -11,7 +11,7 @@ def getToken():
     }
     query = {
         "grant_type":"urn:ibm:params:oauth:grant-type:apikey",
-        "apikey": os.environ["CE_API_KEY"]
+        "apikey": os.environ.get('CE_API_KEY')
     }
     response = requests.post(url,headers=headers,params=query)
     token = json.loads(response.text)
@@ -21,7 +21,7 @@ def getToken():
 def uploadCOS(data):
     url = f"https://s3.ams03.cloud-object-storage.appdomain.cloud/bucket-resources-manager/{os.getenv('CE_ACCOUNT_ID')}-results.csv"
     headers = {
-      "Authorization": f"Bearer {os.getenv('TOKEN')}",
+      "Authorization": f"Bearer {os.environ.get('TOKEN')}",
       "Content-Type": "text/csv"
     }
     results= data.to_csv(sep=';')
@@ -45,19 +45,19 @@ def createResourcesDict(resources, users):
     return df
     
 def getServicesConsumption():
-    csv = getRequest(f"https://s3.ams03.cloud-object-storage.appdomain.cloud/bucket-resources-manager/{os.getenv('CE_ACCOUNT_ID')}.csv")
+    csv = getRequest(f"https://s3.ams03.cloud-object-storage.appdomain.cloud/bucket-resources-manager/{os.environ.get('CE_ACCOUNT_ID')}.csv")
     csvString = csv.text.replace("\r", "")
     df = pd.DataFrame([x.split(';') for x in csvString.split('\n')[1:]], columns=[x for x in csvString.split('\n')[0].split(';')] )
     return df
 
 def addServicesID(users):
-    response = getRequest(f"https://iam.cloud.ibm.com/v1/serviceids?account_id={os.environ['CE_ACCOUNT_ID']}")
+    response = getRequest(f"https://iam.cloud.ibm.com/v1/serviceids?account_id={os.environ.get('CE_ACCOUNT_ID')}")
     services = json.loads(response.text)["serviceids"]
     for service_id in services:
         users[service_id["iam_id"]] = users.get(service_id["created_by"], "") 
 
 def getUsers():
-    response = getRequest(f"https://user-management.cloud.ibm.com/v2/accounts/{os.environ['CE_ACCOUNT_ID']}/users")
+    response = getRequest(f"https://user-management.cloud.ibm.com/v2/accounts/{os.environ.get('CE_ACCOUNT_ID')}/users")
     users = json.loads(response.text)["resources"]
     users_dict = {}
     for user in users:
@@ -72,7 +72,7 @@ def getResources():
 def getRequest(url):
     headers = {
       "Accept": "application/json",
-      "Authorization": f"Bearer {os.getenv('TOKEN')}"
+      "Authorization": f"Bearer {os.environ.get('TOKEN')}"
     }
     response = requests.get(url,headers=headers)
     return response
