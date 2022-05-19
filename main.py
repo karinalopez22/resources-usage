@@ -45,9 +45,8 @@ def createResourcesDict(resources, users):
     
 def getServicesConsumption():
     csv = getRequest(f"https://s3.ams03.cloud-object-storage.appdomain.cloud/bucket-resources-manager/{os.getenv('CE_ACCOUNT_ID')}.csv")
-    csvString = csv.text
-    df = pd.DataFrame([x.split(';') for x in csvString.split('\n')[1:]], columns=[x for x in csvString.split('\n')[0].split(';')])
-    df["Creator"] = " "
+    csvString = csv.text.replace("\r", "")
+    df = pd.DataFrame([x.split(';') for x in csvString.split('\n')[1:]], columns=[x for x in csvString.split('\n')[0].split(';')] )
     return df
 
 def addServicesID(users):
