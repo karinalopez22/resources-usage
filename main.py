@@ -29,6 +29,7 @@ def uploadCOS(data):
 
 def main(): 
     os.environ['TOKEN'] = getToken()
+    print(os.environ)
     resources = getResources()
     users=getUsers()    
     resources_dict = createResourcesDict(resources["resources"], users)
